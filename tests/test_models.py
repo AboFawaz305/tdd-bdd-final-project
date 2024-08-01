@@ -104,3 +104,85 @@ class TestProductModel(unittest.TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+    def test_read_product(self):
+        product = ProductFactory()
+        print(product)
+        product.id = None
+        product.create()
+        assert product.id != None
+        found_product = Product.find(product.id)
+        self.assertEqual(found_product.id, product.id)
+        self.assertEqual(found_product.name, product.name)
+        self.assertEqual(found_product.description, product.description)
+        self.assertEqual(found_product.price, product.price)
+    
+    def test_update_product(self):
+        product = ProductFactory()
+        print(product)
+        product.id = None
+        product.create()
+        print(product)
+        assert product.id != None
+        product.description = "new description"
+        pid = product.id
+        product.update()
+        assert pid == product.id
+        assert product.description == "new description"
+        products = Product.all()
+        assert len(products) == 1
+        assert products[0].id == pid
+        assert products[0].description == "new description"
+
+    def test_delete_product(self):
+        product = ProductFactory()
+        print(product)
+        product.create()
+        assert len(Product.all()) == 1
+        product.delete()
+        assert len(Product.all()) == 0
+
+    def test_list_all_products(self):
+        products = Product.all()
+        assert len(products) == 0
+        for _ in range(5):
+            ProductFactory().create()
+        products = Product.all()
+        assert len(products) == 5
+
+    def test_find_by_name_product(self):
+        for _ in range(5):
+            ProductFactory().create()
+        products = Product.all()
+        p1name = products[0].name
+        count = len([product for product in products if product.name == p1name])
+        found = Product.find_by_name(p1name)
+        assert found.count() == count
+        for p in found:
+            assert p.name == p1name
+
+    def test_find_by_availability(self):
+        products = ProductFactory.create_batch(10)
+        for p in products:
+            p.create()
+        p1avail =products[0].available
+        count = len([product for product in products if product.available == p1avail])
+        found = Product.find_by_availability(p1avail)
+        assert found.count() == count
+        for p in found:
+            assert p.available == p1avail
+
+    def test_find_by_category_product(self):
+        products = ProductFactory.create_batch(10)
+        for p in products:
+            p.create()
+        p1category = products[0].category
+        count = len([product for product in products if product.category == p1category])
+        found = Product.find_by_category(p1category)
+        self.assertEqual(found.count(), count)
+        for product in found:
+            self.assertEqual(product.category, p1category)
+
+
+
+
+
